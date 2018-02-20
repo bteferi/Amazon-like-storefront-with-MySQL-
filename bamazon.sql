@@ -15,6 +15,7 @@ CREATE TABLE products(
 );
 
 
+
 INSERT INTO products (product_name, department_name, price, stock_quantity )
 VALUES ("Iphone X", "electronics", "200", "12");
 
@@ -50,4 +51,5 @@ VALUES ("Coconut oil", "cosmetics", "25", "75");
 
 
 INSERT INTO products (product_name, department_name, price, stock_quantity )
-VALUES ("Coconut oil", "cosmetics", "25", "75");
+VALUES ("Green Tea", "health", "10", "75");
+
