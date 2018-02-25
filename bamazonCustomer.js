@@ -1,5 +1,11 @@
 var inquirer = require("inquirer")
 var mysql = require("mysql")
+
+var selectedCus_Id;
+var selectedItemName;
+var selectedItemQty;
+var selectedItemPrice;
+
 require("dotenv").config();
 
 //====================================================================//
@@ -19,57 +25,133 @@ var connection = mysql.createConnection({
 
 connection.connect(function(err) {
   if (err) throw err;
-  console.log(" *****************HERE IS EVERTHING IN STORE*******************");
-  everythingInStore();
-   //
+
+  inquirer
+    .prompt([
+      // Here we create a basic text prompt.
+      {
+        type: "confirm",
+        message: "welcome to Bamazon!Would you like to shope?",
+        name: "letShop",
+        default:true
+         //====what if customer doesnt wana shop
+      },
+    ]).then(function(yesIwannaShop) {
+          var LetsShop = yesIwannaShop.letShop
+          if(LetsShop==true){
+            console.log(" *****************HERE IS EVERTHING IN STORE*******************");
+            everythingInStore();
+          }else{
+            console.log("Please visit us on your payday")
+          }
+    })
+
+
+  // console.log(" *****************HERE IS EVERTHING IN STORE*******************");
+  // everythingInStore();
+  //
 });
 //===========================BELOW IS WHERE i CAN ADD MY CODE TO PRING ==/
 
 function everythingInStore() {
- connection.query('SELECT * FROM products', function(error, res) {
+  connection.query('SELECT * FROM products', function(error, res) {
     if (error) throw err;
     //======================no error go to the next step ===
     // console.log(res)
     res.forEach(function(res) {
-        // console.log(res);
-      console.log("Item Id :" +  res.item_id  + " , name : " + res.product_name + " , Dept : " +  res.department_name + ", Price" +  res.price + "\n");
-    console.log ("-----------------------------------------------------------------------------------");
-
-
+      // console.log(res);
+      console.log("Item Id :" + res.item_id + " , name : " + res.product_name + " , Dept : " + res.department_name + ", Price" + res.price + "\n");
+      console.log("-----------------------------------------------------------------------------------");
     });
-      connection.end();
-});
+    selectProductId();
+
+  });
 }
-
-
-
 
 //================== question for customers ==//
 
 // selectProductId();
-function selectProductId(){
-  inquirer
-    .prompt([
+function selectProductId() {
 
-      {
-        type: "input",
-        message: "Please select the Product ID for the Item you would like to purchase",
-        name: "PickProductID",
+  // console.log("yello")
+  inquirer.prompt([
 
-      },
-]).then(function(inquirerResponse) {
-      // here goes all my response
-        if (inquirerResponse.PickProductID) {
-        console.log(" test")
+    {
+      type: "input",
+      message: "Please enter the Product ID for the Item you would like to purchase?",
+      name: "PickProductID",
 
-        //grab all the cutomer response
+    },
+  ]).then(function(inquirerResponse) {
+
+    connection.query('SELECT * FROM products WHERE ?', {
+      item_id: inquirerResponse.PickProductID
+    }, function(error, selectedItem) {
+      if (error) throw error;
+      selectedCus_Id = inquirerResponse.PickProductID;
+
+      for (var i = 0; i < selectedItem.length; i++) {
+        selectedItemName = selectedItem[i].product_name
+        selectedItemQty = parseInt(selectedItem[i].stock_quantity);
+        selectedItemPrice = parseInt(selectedItem[i].price);
+        selectedItemID = selectedItem[i].item_id;
+
+        console.log("You have selected" + "  Item ID  : " + selectedItemID)
+        console.log("Product name   :" + selectedItemName)
+        // console.log(selectedItemQty)
+        console.log("Product Price   :$" + selectedItemPrice)
+        // grabbing users input and displaying the specific details of product
       }
-})
 
-};
+      inquirer.prompt([{
+        type: "input",
+        message: " The store currently has " + selectedItemQty + " of " + selectedItemName + " how many would you like to purchase ?",
+        name: "readytoBuy"
+      }]).then(function(pickQtytoPurchase) {
+
+        connection.query('UPDATE products SET ? WHERE ?', [{
+              stock_quantity: pickQtytoPurchase.readytoBuy
+            },
+            {
+              item_id: inquirerResponse.PickProductID
+            }
+          ],
+          function(error, myd) {
+            if (error) throw error;
+            var selectedCus_amount = pickQtytoPurchase.readytoBuy;
+
+            console.log(" you have selected to purchase :  " + selectedCus_amount + "   amount of this item")
+
+            if (selectedCus_amount > selectedItemQty) {
+              console.log("SOLD OUT FOR THAT Amount ")
+            } else {
+              for (var i = 0; i < selectedCus_amount.length; i++) {
+                selectedItemQty -= selectedCus_amount
+
+                console.log(" after purchase this is left in the DB :  " + selectedItemQty)
+                var totalPrice = selectedCus_amount * selectedItemPrice;
+
+
+                console.log(" here is your total fee at this moment :   $" + totalPrice)
+
+              }
+            }
 
 
 
+
+
+          })
+
+
+      })
+
+    })
+
+  })
+
+
+}
 
 
 

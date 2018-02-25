@@ -52,4 +52,3 @@ VALUES ("Coconut oil", "cosmetics", "25", "75");
 
 INSERT INTO products (product_name, department_name, price, stock_quantity )
 VALUES ("Green Tea", "health", "10", "75");
-
