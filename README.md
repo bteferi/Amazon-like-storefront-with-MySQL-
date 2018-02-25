@@ -11,9 +11,8 @@ Things you need to install:
 
 
 ![Ready to shop](bamazon.gif)
-Format: ![Alt Text](url)
+ 
 
 
 
-![Come back next time](/bamazon.gif)
-Format: ![Alt Text](url)
+![Come back next time](nosale.gif)
