@@ -43,6 +43,7 @@ connection.connect(function(err) {
             everythingInStore();
           }else{
             console.log("Please visit us on your payday")
+
           }
     })
 
@@ -128,7 +129,7 @@ function selectProductId() {
               for (var i = 0; i < selectedCus_amount.length; i++) {
                 selectedItemQty -= selectedCus_amount
 
-                console.log(" after purchase this is left in the DB :  " + selectedItemQty)
+                // console.log(" after purchase this is left in the DB :  " + selectedItemQty)
                 var totalPrice = selectedCus_amount * selectedItemPrice;
 
 
